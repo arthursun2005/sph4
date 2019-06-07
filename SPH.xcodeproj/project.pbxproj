@@ -53,6 +53,7 @@
 		8E5365AD22A64949008AD6DB /* point.vs */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = point.vs; sourceTree = "<group>"; };
 		8E5365AE22A64A39008AD6DB /* common.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = common.glsl; sourceTree = "<group>"; };
 		8E5365AF22A64ADA008AD6DB /* Shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Shape.h; sourceTree = "<group>"; };
+		8E58E61222AB254C00BB0B24 /* settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +98,7 @@
 				8E5365A022A63B95008AD6DB /* ParticleSystem.hpp */,
 				8E5365AF22A64ADA008AD6DB /* Shape.h */,
 				8E53659E22A63598008AD6DB /* common.h */,
+				8E58E61222AB254C00BB0B24 /* settings.h */,
 				8E304AC222A7999B00F5810B /* hasher.cl */,
 				8E304AC622A79C8A00F5810B /* toList.cl */,
 				8E304AC022A74CAC00F5810B /* sort.cl */,

@@ -17,14 +17,16 @@ double pmouseX = mouseX, pmouseY = mouseY;
 int width = 1280;
 int height = 840;
 float dt = 0.016f;
-float D = 3.0f;
+float D = 0.25f;
 
 Frame frame;
 
 float dMouseX = 0.0f;
 float dMouseY = 0.0f;
 
-vec2 gravity(0.0f, -9.8f);
+vec2 gravity(0.0f, 0.0f);
+
+float timeBtwFrames = 0.016f;
 
 #ifdef DEBUG
 
@@ -56,7 +58,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
             vec2 mouse = getMouse();
             
             Shape shape;
-            shape.initializeAsCircle(mouse, 50.0f, 60);
+            shape.initializeAsCircle(mouse, 5.0f, 60);
             
             ps.add(shape, vec2(0.0f, 0.0f));
         }
@@ -128,7 +130,7 @@ int main(int argc, const char * argv[]) {
     frame.y = 0;
     frame.w = width * 2;
     frame.h = height * 2;
-    frame.scl = 5.0f;
+    frame.scl = 100.0f;
     frame.offset = vec2(0.0f, 0.0f);
     
     do {
@@ -169,8 +171,13 @@ int main(int argc, const char * argv[]) {
         
         pmouseX = mouseX;
         pmouseY = mouseY;
+        
+        float finish = glfwGetTime();
+        
+        float ssecs = std::max(timeBtwFrames - (finish - currentTime), 0.0f);
+
+        usleep(useconds_t(ssecs * 1000000.0f));
     } while (glfwWindowShouldClose(window) == GL_FALSE && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS);
-    ps.destory();
     renderer.destory();
     glfwDestroyCursor(cursor);
     glfwTerminate();

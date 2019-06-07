@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <vector>
 
 #ifdef __APPLE__
 #include <OpenCL/opencl.h>
@@ -20,8 +21,12 @@
 #include <CL/cl.h>
 #endif
 
+#include "settings.h"
+
 #define current_nanosecond \
 std::chrono::high_resolution_clock::now()
+
+typedef std::chrono::high_resolution_clock::time_point nanosecond_type;
 
 #define Alloc(size) \
 (__builtin_operator_new(size))
@@ -45,9 +50,9 @@ struct vec2
     float x;
     float y;
     
-    vec2() {}
+    inline vec2() {}
     
-    vec2(float x, float y) : x(x), y(y) {}
+    inline vec2(float x, float y) : x(x), y(y) {}
     
     inline vec2& operator -= (const vec2& v) {
         x -= v.x;
@@ -113,9 +118,9 @@ struct Frame
     float scl;
     vec2 offset;
     
-    Frame() {}
+    inline Frame() {}
     
-    Frame(int x, int y, int w, int h, float scl, const vec2& offset) : x(x), y(y), w(w), h(h), scl(scl), offset(offset) {}
+    inline Frame(int x, int y, int w, int h, float scl, const vec2& offset) : x(x), y(y), w(w), h(h), scl(scl), offset(offset) {}
 };
 
 /**
@@ -166,6 +171,7 @@ inline cl_kernel create_cl_kernel(cl_context context, cl_device_id device_id, co
     clBuildProgram(program, 1, &device_id, NULL, NULL, NULL);
     cl_kernel kernel = clCreateKernel(program, kernel_name, NULL);
     clReleaseProgram(program);
+    printf("made %s\n", kernel_name);
     return kernel;
 }
 

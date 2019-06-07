@@ -48,6 +48,7 @@ void PSGraphic::initialize() {
     glBindVertexArray(vao);
     
     glBindBuffer(GL_ARRAY_BUFFER, positions);
+    glBufferData(GL_ARRAY_BUFFER, MAX_PARTICLE_COUNT * sizeof(vec2), 0, GL_STREAM_DRAW);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
@@ -63,13 +64,6 @@ void PSGraphic::destory() {
 }
 
 void PSGraphic::load() {
-    if(ps->capacity > bufferSize) {
-        bufferSize = ps->capacity;
-        
-        glBindBuffer(GL_ARRAY_BUFFER, positions);
-        glBufferData(GL_ARRAY_BUFFER, bufferSize * sizeof(vec2), 0, GL_STREAM_DRAW);
-    }
-    
     glBindBuffer(GL_ARRAY_BUFFER, positions);
     glBufferSubData(GL_ARRAY_BUFFER, 0, ps->count * sizeof(vec2), ps->positions);
 }
@@ -77,13 +71,12 @@ void PSGraphic::load() {
 void PSGraphic::draw(GLuint target, const Frame& frame) {
     load();
     
+    glPointSize(0.25f * ps->diameter * frame.scl);
+    
     renderer.bind();
     renderer.uniform2f("scl", frame.scl/(float)frame.w, frame.scl/(float)frame.h);
     renderer.uniform2f("offset", frame.offset.x, frame.offset.y);
-    renderer.uniform1f("size", 0.25f * ps->diameter * frame.scl);
-    renderer.uniform4f("fill", 0.0f, 0.0f, 1.0f, 1.0f);
-    
-    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    renderer.uniform4f("fill", 0.4f, 0.8f, 1.0f, 1.0f);
     
     glBindFramebuffer(GL_FRAMEBUFFER, target);
     glBindVertexArray(vao);
@@ -91,8 +84,6 @@ void PSGraphic::draw(GLuint target, const Frame& frame) {
     glDrawArrays(GL_POINTS, 0, ps->count);
     glBindVertexArray(0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
-    glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
 
 
