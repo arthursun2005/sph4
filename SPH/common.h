@@ -26,6 +26,9 @@
 #define current_nanosecond \
 std::chrono::high_resolution_clock::now()
 
+#define current_microsecond \
+std::chrono::system_clock::now()
+
 typedef std::chrono::high_resolution_clock::time_point nanosecond_type;
 
 #define Alloc(size) \

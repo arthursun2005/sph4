@@ -17,8 +17,6 @@ class PSGraphic
     
 private:
     
-    int bufferSize;
-    
     GLuint positions;
     GLuint vao;
     
@@ -34,7 +32,10 @@ public:
     
     void destory();
     
-    void load();
+    inline void load() {
+        glBindBuffer(GL_ARRAY_BUFFER, positions);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, ps->count * sizeof(vec2), ps->positions);
+    }
     
     void draw(GLuint target, const Frame& frame);
 };
@@ -53,19 +54,12 @@ void PSGraphic::initialize() {
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
-    
-    bufferSize = 0;
 }
 
 void PSGraphic::destory() {
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &positions);
     renderer.destory();
-}
-
-void PSGraphic::load() {
-    glBindBuffer(GL_ARRAY_BUFFER, positions);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, ps->count * sizeof(vec2), ps->positions);
 }
 
 void PSGraphic::draw(GLuint target, const Frame& frame) {
@@ -76,7 +70,7 @@ void PSGraphic::draw(GLuint target, const Frame& frame) {
     renderer.bind();
     renderer.uniform2f("scl", frame.scl/(float)frame.w, frame.scl/(float)frame.h);
     renderer.uniform2f("offset", frame.offset.x, frame.offset.y);
-    renderer.uniform4f("fill", 0.4f, 0.8f, 1.0f, 1.0f);
+    renderer.uniform4f("fill", 0.2f, 0.6f, 1.0f, 1.0f);
     
     glBindFramebuffer(GL_FRAMEBUFFER, target);
     glBindVertexArray(vao);

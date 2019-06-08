@@ -107,6 +107,12 @@ public:
         initialize_cl();
     }
     
+    inline void clear() {
+        count = 0;
+        releaseMemObjs();
+        createMemObjs();
+    }
+    
     inline void addParticle(const vec2& p, const vec2& v) {
         if(count < MAX_PARTICLE_COUNT) {
             positions[count] = p;
@@ -114,11 +120,11 @@ public:
         }
     }
     
-    void add(const Shape& shape, const vec2& linearVelocity) {
+    void add(const Shape& shape, const vec2& linearVelocity, float dist = DistBtwParticles) {
         int oldCount = count;
         
         AABB aabb = shape.aabb();
-        float stride = diameter * DistBtwParticles;
+        float stride = diameter * dist;
         for (float y = aabb.lowerBound.y; y < aabb.upperBound.y; y += stride) {
             for (float x = aabb.lowerBound.x; x < aabb.upperBound.x; x += stride) {
                 vec2 p(x, y);
@@ -128,6 +134,7 @@ public:
         }
         
         clEnqueueWriteBuffer(queue, velocities_cl, CL_TRUE, oldCount * sizeof(vec2), (count - oldCount) * sizeof(vec2), velocities + oldCount, 0, NULL, NULL);
+        clEnqueueWriteBuffer(queue, positions_cl, CL_TRUE, oldCount * sizeof(vec2), (count - oldCount) * sizeof(vec2), positions + oldCount, 0, NULL, NULL);
         
         clFlush(queue);
         clFinish(queue);

@@ -9,7 +9,7 @@
 #ifndef settings_h
 #define settings_h
 
-/// 2 ^ 25
-#define MAX_PARTICLE_COUNT 33554432
+/// 2 ^ 24
+#define MAX_PARTICLE_COUNT 16777216
 
 #endif /* settings_h */

@@ -20,7 +20,23 @@ void ParticleSystem::sortProxies() {
     
     assert(clEnqueueTask(queue, sorter, 0, NULL, NULL) == CL_SUCCESS);
     
+    k = 8;
+    
+    clSetKernelArg(sorter, 0, sizeof(tempProxies), (void*)&tempProxies);
+    clSetKernelArg(sorter, 1, sizeof(proxies), (void*)&proxies);
+    clSetKernelArg(sorter, 2, sizeof(k), (void*)&k);
+    
+    assert(clEnqueueTask(queue, sorter, 0, NULL, NULL) == CL_SUCCESS);
+    
     k = 16;
+    
+    clSetKernelArg(sorter, 0, sizeof(proxies), (void*)&proxies);
+    clSetKernelArg(sorter, 1, sizeof(tempProxies), (void*)&tempProxies);
+    clSetKernelArg(sorter, 2, sizeof(k), (void*)&k);
+    
+    assert(clEnqueueTask(queue, sorter, 0, NULL, NULL) == CL_SUCCESS);
+    
+    k = 24;
     
     clSetKernelArg(sorter, 0, sizeof(tempProxies), (void*)&tempProxies);
     clSetKernelArg(sorter, 1, sizeof(proxies), (void*)&proxies);
@@ -38,6 +54,7 @@ void ParticleSystem::createProxies() {
     clSetKernelArg(hasher, 0, sizeof(positions_cl), (void*)&positions_cl);
     clSetKernelArg(hasher, 1, sizeof(proxies), (void*)&proxies);
     clSetKernelArg(hasher, 2, sizeof(diameter), (void*)&diameter);
+    clSetKernelArg(hasher, 3, sizeof(count), (void*)&count);
     
     clEnqueueNDRangeKernel(queue, hasher, 1, NULL, &size, NULL, 0, NULL, NULL);
     
@@ -47,9 +64,6 @@ void ParticleSystem::createProxies() {
 
 void ParticleSystem::toOffsetList() {
     size_t size = count;
-    
-    int k = count;
-    //clEnqueueFillBuffer(queue, offsetList, (void*)&k, sizeof(k), 0, MAX_PARTICLE_COUNT * sizeof(k), 0, NULL, NULL);
     
     clSetKernelArg(toList, 0, sizeof(proxies), (void*)&proxies);
     clSetKernelArg(toList, 1, sizeof(offsetList), (void*)&offsetList);
@@ -72,6 +86,7 @@ void ParticleSystem::solve(float dt) {
     clSetKernelArg(solver, 6, sizeof(count), (void*)&count);
     clSetKernelArg(solver, 7, sizeof(diameter), (void*)&diameter);
     clSetKernelArg(solver, 8, sizeof(accelerations), (void*)&accelerations);
+    clSetKernelArg(solver, 9, sizeof(weights), (void*)&weights);
     
     assert(clEnqueueNDRangeKernel(queue, solver, 1, NULL, &size, NULL, 0, NULL, NULL) == CL_SUCCESS);
     
@@ -110,27 +125,13 @@ void ParticleSystem::destory_cl() {
 void ParticleSystem::step(float dt) {
     if(count == 0) return;
     
-    std::vector<nanosecond_type> timer;
-    
-    clEnqueueWriteBuffer(queue, positions_cl, CL_TRUE, 0, count * sizeof(vec2), positions, 0, NULL, NULL);
-    
-    timer.push_back(current_nanosecond);
-    
     createProxies();
-    
-    timer.push_back(current_nanosecond);
     
     sortProxies();
     
-    timer.push_back(current_nanosecond);
-    
     toOffsetList();
     
-    timer.push_back(current_nanosecond);
-    
     solve(dt);
-    
-    timer.push_back(current_nanosecond);
     
     size_t size = count;
     
@@ -138,6 +139,7 @@ void ParticleSystem::step(float dt) {
     clSetKernelArg(adder, 1, sizeof(positions_cl), (void*)&positions_cl);
     clSetKernelArg(adder, 2, sizeof(accelerations), (void*)&accelerations);
     clSetKernelArg(adder, 3, sizeof(dt), (void*)&dt);
+    clSetKernelArg(adder, 4, sizeof(diameter), (void*)&diameter);
     
     clEnqueueNDRangeKernel(queue, adder, 1, NULL, &size, NULL, 0, NULL, NULL);
     
@@ -146,12 +148,4 @@ void ParticleSystem::step(float dt) {
     
     clFlush(queue);
     clFinish(queue);
-    
-    timer.push_back(current_nanosecond);
-    
-    int n = (int)timer.size() - 1;
-    for(int i = 0; i != n; ++i) {
-        //printf("%d : %.4f\n", i, 0.000001f * (timer[i + 1] - timer[i]).count());
-    }
-    //printf("%d\n", count);
 }

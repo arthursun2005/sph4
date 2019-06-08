@@ -17,14 +17,14 @@ double pmouseX = mouseX, pmouseY = mouseY;
 int width = 1280;
 int height = 840;
 float dt = 0.016f;
-float D = 0.25f;
+float D = 0.05f;
 
 Frame frame;
 
 float dMouseX = 0.0f;
 float dMouseY = 0.0f;
 
-vec2 gravity(0.0f, 0.0f);
+vec2 gravity(0.0f, -9.8f);
 
 float timeBtwFrames = 0.016f;
 
@@ -54,13 +54,38 @@ inline vec2 getMouse() {
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if(action == GLFW_RELEASE) {
+        vec2 mouse = getMouse();
+        
         if(key == GLFW_KEY_A) {
-            vec2 mouse = getMouse();
-            
             Shape shape;
-            shape.initializeAsCircle(mouse, 5.0f, 60);
+            shape.initializeAsCircle(mouse, 1.0f, 60);
             
             ps.add(shape, vec2(0.0f, 0.0f));
+        }
+        
+        if(key == GLFW_KEY_S) {
+            Shape shape;
+            shape.initializeAsCircle(mouse, 0.2f, 60);
+            
+            ps.add(shape, vec2(100.0f, 0.0f));
+        }
+        
+        if(key == GLFW_KEY_B) {
+            Shape shape;
+            shape.initializeAsBox(mouse, 1.0f, 10.0f);
+            
+            ps.add(shape, vec2(0.0f, 0.0f));
+        }
+        
+        if(key == GLFW_KEY_Q) {
+            Shape shape;
+            shape.initializeAsBox(mouse, 1.0f, 1.0f);
+            
+            ps.add(shape, vec2(0.0f, 0.0f));
+        }
+        
+        if(key == GLFW_KEY_R) {
+            ps.clear();
         }
         
         if(key == GLFW_KEY_N) {
@@ -130,13 +155,13 @@ int main(int argc, const char * argv[]) {
     frame.y = 0;
     frame.w = width * 2;
     frame.h = height * 2;
-    frame.scl = 100.0f;
+    frame.scl = 200.0f;
     frame.offset = vec2(0.0f, 0.0f);
     
     do {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        
+
         glfwGetCursorPos(window, &mouseX, &mouseY);
         
         float currentTime = glfwGetTime();
@@ -162,7 +187,7 @@ int main(int argc, const char * argv[]) {
         frame.offset.x += dMouseX * 4.0f / frame.scl;
         frame.offset.y += dMouseY * 4.0f / frame.scl;
         
-        ps.step(dt, 1);
+        ps.step(dt, 6);
         
         renderer.draw(0, frame);
         
@@ -171,7 +196,7 @@ int main(int argc, const char * argv[]) {
         
         pmouseX = mouseX;
         pmouseY = mouseY;
-        
+
         float finish = glfwGetTime();
         
         float ssecs = std::max(timeBtwFrames - (finish - currentTime), 0.0f);
